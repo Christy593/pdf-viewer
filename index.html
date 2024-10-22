@@ -2,29 +2,6 @@
 <html>
 <head>
   <title>View PDF</title>
-  <style>
-    /* 设置 pdf-container 居中 */
-    #pdf-container {
-      display: flex;
-      flex-direction: column; /* 垂直布局 */
-      align-items: center;    /* 居中对齐 */
-      justify-content: center;/* 水平居中 */
-      margin: 0;
-      padding: 0;
-    }
-
-    /* 确保 canvas 外部的容器居中 */
-    .pdf-page-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px; /* 每一页之间留一些间距 */
-    }
-
-    /* 确保 canvas 元素本身也居中 */
-    canvas {
-      margin: auto;
-    }
-  </style>
 </head>
 <body>
   <div id="pdf-container"></div> <!-- 用于显示所有 PDF 页面 -->
@@ -51,14 +28,9 @@
           const scale = 1.5;
           const viewport = page.getViewport({ scale: scale });
 
-          // 创建一个 div 容器用于居中每个 canvas
-          const pageContainer = document.createElement('div');
-          pageContainer.className = 'pdf-page-container';
-          pdfContainer.appendChild(pageContainer);
-
           // 创建 canvas 元素以显示每一页
           const canvas = document.createElement('canvas');
-          pageContainer.appendChild(canvas);
+          pdfContainer.appendChild(canvas);
 
           const context = canvas.getContext('2d');
           canvas.height = viewport.height;
