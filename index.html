@@ -25,7 +25,7 @@
             // 循环渲染每一页
             for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                 pdf.getPage(pageNum).then(function(page) {
-                    const scale = 1.0;
+                    const scale = 1.5;
                     const viewport = page.getViewport({ scale: scale });
 
                     // 创建 canvas 元素以显示每一页
