@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>View PDF</title>
-    <style>
+  <title>View PDF</title>
+  <style>
     /* 设置 pdf-container 居中 */
     #pdf-container {
       display: flex;
-      justify-content: center; /* 水平居中 */
-      align-items: center;     /* 垂直居中 */
-      height: 100vh;           /* 高度为浏览器视窗高度 */
-      margin: 0;               /* 清除默认外边距 */
-      padding: 0;              /* 清除默认内边距 */
-      box-sizing: border-box;  /* 包含内边距在内 */
+      flex-direction: column; /* 垂直布局 */
+      align-items: center;    /* 居中对齐 */
+      justify-content: center;/* 水平居中 */
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 确保 canvas 外部的容器居中 */
+    .pdf-page-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px; /* 每一页之间留一些间距 */
     }
 
     /* 确保 canvas 元素本身也居中 */
@@ -21,48 +27,51 @@
   </style>
 </head>
 <body>
-    <div id="pdf-container"></div> <!-- 用于显示所有 PDF 页面 -->
+  <div id="pdf-container"></div> <!-- 用于显示所有 PDF 页面 -->
 
-    <!-- 使用 type="module" 来加载模块化的 PDF.js -->
-    <script type="module">
-        // 使用模块化导入 PDF.js
-        import * as pdfjsLib from './pdfjs/pdf.mjs';
+  <!-- 使用"type=module" 来加载模块化的 PDF.js -->
+  <script type="module">
+    // 使用模块导入 PDF.js
+    import * as pdfjsLib from './pdfjs/pdf.js';
 
-        // 设置 worker 文件路径
-        pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
+    // 设置 worker 文件路径
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
 
-        // 设置 PDF 文件路径
-        const url = 'PDFsam_merge.pdf'; // 确保 PDF 文件在同一个目录下
+    // 设置 PDF 文件路径
+    const url = 'PDFsam_merge.pdf'; // 确保 PDF 文件在同一个目录下
 
-        // 加载并显示 PDF
-        const loadingTask = pdfjsLib.getDocument(url);
-        loadingTask.promise.then(function(pdf) {
-            const pdfContainer = document.getElementById('pdf-container');
+    // 加载并显示 PDF
+    const loadingTask = pdfjsLib.getDocument(url);
+    loadingTask.promise.then(function(pdf) {
+      const pdfContainer = document.getElementById('pdf-container');
 
-            // 循环渲染每一页
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                pdf.getPage(pageNum).then(function(page) {
-                    const scale = 1.5;
-                    const viewport = page.getViewport({ scale: scale });
+      // 循环渲染每一页
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        pdf.getPage(pageNum).then(function(page) {
+          const scale = 1.5;
+          const viewport = page.getViewport({ scale: scale });
 
-                    // 创建 canvas 元素以显示每一页
-                    const canvas = document.createElement('canvas');
-                    pdfContainer.appendChild(canvas);
+          // 创建一个 div 容器用于居中每个 canvas
+          const pageContainer = document.createElement('div');
+          pageContainer.className = 'pdf-page-container';
+          pdfContainer.appendChild(pageContainer);
 
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+          // 创建 canvas 元素以显示每一页
+          const canvas = document.createElement('canvas');
+          pageContainer.appendChild(canvas);
 
-                    const renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    };
-                    page.render(renderContext);
-                });
-            }
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
         });
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
-
-
