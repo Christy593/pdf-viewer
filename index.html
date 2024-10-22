@@ -2,6 +2,23 @@
 <html>
 <head>
     <title>View PDF</title>
+    <style>
+    /* 设置 pdf-container 居中 */
+    #pdf-container {
+      display: flex;
+      justify-content: center; /* 水平居中 */
+      align-items: center;     /* 垂直居中 */
+      height: 100vh;           /* 高度为浏览器视窗高度 */
+      margin: 0;               /* 清除默认外边距 */
+      padding: 0;              /* 清除默认内边距 */
+      box-sizing: border-box;  /* 包含内边距在内 */
+    }
+
+    /* 确保 canvas 元素本身也居中 */
+    canvas {
+      margin: auto;
+    }
+  </style>
 </head>
 <body>
     <div id="pdf-container"></div> <!-- 用于显示所有 PDF 页面 -->
