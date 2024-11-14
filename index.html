@@ -8,13 +8,9 @@
 
     <!-- 使用 type="module" 来加载模块化的 PDF.js -->
     <script type="module">
-        // 使用模块化导入 PDF.js
         import * as pdfjsLib from './pdfjs/pdf.mjs';
-
-        // 设置 worker 文件路径
         pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
 
-        // PDF 文件数组
         const pdfFiles = [
             'Hong_Kong_Cafe_Menu1.pdf',
             'Hong_Kong_Cafe_Menu2.pdf',
@@ -23,17 +19,17 @@
 
         const pdfContainer = document.getElementById('pdf-container');
 
-        // 加载并显示每个 PDF 文件
-        pdfFiles.forEach((url) => {
-            const loadingTask = pdfjsLib.getDocument(url);
-            loadingTask.promise.then(pdf => {
-                // 循环渲染每个 PDF 文件的每一页
-                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                    pdf.getPage(pageNum).then(page => {
+        // 定义一个异步函数来按顺序加载 PDF 文件
+        async function renderPDFsSequentially() {
+            for (const url of pdfFiles) {
+                try {
+                    const pdf = await pdfjsLib.getDocument(url).promise;
+
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        const page = await pdf.getPage(pageNum);
                         const scale = 1.5;
                         const viewport = page.getViewport({ scale: scale });
 
-                        // 创建 canvas 元素以显示每一页
                         const canvas = document.createElement('canvas');
                         pdfContainer.appendChild(canvas);
 
@@ -45,13 +41,16 @@
                             canvasContext: context,
                             viewport: viewport
                         };
-                        page.render(renderContext);
-                    });
+                        await page.render(renderContext).promise;
+                    }
+                } catch (error) {
+                    console.error(`Error loading PDF ${url}:`, error);
                 }
-            }).catch(error => {
-                console.error(`Error loading PDF ${url}:`, error);
-            });
-        });
+            }
+        }
+
+        // 调用异步函数来按顺序加载和渲染 PDF
+        renderPDFsSequentially();
     </script>
 </body>
 </html>
