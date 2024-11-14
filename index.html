@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>View PDF</title>
+  <title>View Multiple PDFs</title>
 </head>
 <body>
     <div id="pdf-container"></div> <!-- 用于显示所有 PDF 页面 -->
@@ -14,36 +14,50 @@
         // 设置 worker 文件路径
         pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
 
-        // 设置 PDF 文件路径
-        const url = 'Hong_Kong_Cafe_Menu.pdf'; // 确保 PDF 文件在同一个目录下
+        // PDF 文件数组
+        const pdfFiles = [
+            'Hong_Kong_Cafe_Menu1.pdf',
+            'Hong_Kong_Cafe_Menu2.pdf',
+            'Hong_Kong_Cafe_Menu3.pdf'
+        ];
 
-        // 加载并显示 PDF
-        const loadingTask = pdfjsLib.getDocument(url);
-        loadingTask.promise.then(function(pdf) {
-            const pdfContainer = document.getElementById('pdf-container');
+        const pdfContainer = document.getElementById('pdf-container');
 
-            // 循环渲染每一页
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                pdf.getPage(pageNum).then(function(page) {
-                    const scale = 1.5;
-                    const viewport = page.getViewport({ scale: scale });
+        // 加载并显示每个 PDF 文件
+        pdfFiles.forEach((url, index) => {
+            const loadingTask = pdfjsLib.getDocument(url);
+            loadingTask.promise.then(pdf => {
+                const pdfTitle = document.createElement('h3');
+                pdfTitle.innerText = `PDF ${index + 1}`;
+                pdfContainer.appendChild(pdfTitle);
 
-                    // 创建 canvas 元素以显示每一页
-                    const canvas = document.createElement('canvas');
-                    pdfContainer.appendChild(canvas);
+                // 循环渲染每个 PDF 文件的每一页
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    pdf.getPage(pageNum).then(page => {
+                        const scale = 1.5;
+                        const viewport = page.getViewport({ scale: scale });
 
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                        // 创建 canvas 元素以显示每一页
+                        const canvas = document.createElement('canvas');
+                        pdfContainer.appendChild(canvas);
 
-                    const renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    };
-                    page.render(renderContext);
-                });
-            }
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        page.render(renderContext);
+                    });
+                }
+            }).catch(error => {
+                console.error(`Error loading PDF ${url}:`, error);
+            });
         });
     </script>
 </body>
 </html>
+
+
