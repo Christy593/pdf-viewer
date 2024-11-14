@@ -24,13 +24,9 @@
         const pdfContainer = document.getElementById('pdf-container');
 
         // 加载并显示每个 PDF 文件
-        pdfFiles.forEach((url, index) => {
+        pdfFiles.forEach((url) => {
             const loadingTask = pdfjsLib.getDocument(url);
             loadingTask.promise.then(pdf => {
-                const pdfTitle = document.createElement('h3');
-                pdfTitle.innerText = `PDF ${index + 1}`;
-                pdfContainer.appendChild(pdfTitle);
-
                 // 循环渲染每个 PDF 文件的每一页
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                     pdf.getPage(pageNum).then(page => {
@@ -59,5 +55,3 @@
     </script>
 </body>
 </html>
-
-
