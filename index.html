@@ -19,7 +19,6 @@
 
         const pdfContainer = document.getElementById('pdf-container');
 
-        // 定义一个异步函数来按顺序加载 PDF 文件
         async function renderPDFsSequentially() {
             for (const url of pdfFiles) {
                 try {
@@ -30,12 +29,21 @@
                         const scale = 1.5;
                         const viewport = page.getViewport({ scale: scale });
 
+                        // 创建 canvas 并设置高分辨率
                         const canvas = document.createElement('canvas');
-                        pdfContainer.appendChild(canvas);
-
                         const context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
+                        const dpr = window.devicePixelRatio || 1; // 获取设备像素比
+
+                        // 设置 canvas 实际渲染的尺寸为 viewport 尺寸乘以 dpr
+                        canvas.width = viewport.width * dpr;
+                        canvas.height = viewport.height * dpr;
+                        context.scale(dpr, dpr); // 缩放以匹配 viewport 尺寸
+
+                        // 设置 canvas 的展示尺寸为 viewport 尺寸
+                        canvas.style.width = `${viewport.width}px`;
+                        canvas.style.height = `${viewport.height}px`;
+
+                        pdfContainer.appendChild(canvas);
 
                         const renderContext = {
                             canvasContext: context,
